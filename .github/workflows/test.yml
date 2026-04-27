@@ -11,28 +11,47 @@ env:
   FOUNDRY_PROFILE: ci
 
 jobs:
-  check:
-    name: Foundry project
+  lint-and-test:
+    name: Lint, Build & Test
     runs-on: ubuntu-latest
     permissions:
       contents: read
+
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
         with:
           persist-credentials: false
           submodules: recursive
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
 
       - name: Show Forge version
         run: forge --version
 
-      - name: Run Forge fmt
+      # Formatting
+      - name: Run Forge fmt check
         run: forge fmt --check
 
-      - name: Run Forge build
+      # Build
+      - name: Build contracts (with sizes)
         run: forge build --sizes
 
-      - name: Run Forge tests
+      # Tests
+      - name: Run unit tests
+        run: forge test --match-path "test/unit/**" -vvv
+
+      - name: Run all tests
         run: forge test -vvv
+
+      # Coverage
+      - name: Generate coverage report
+        run: forge coverage --report lcov --report summary 2>&1 | tee coverage-summary.txt
+
+      - name: Upload coverage summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-summary
+          path: coverage-summary.txt
