@@ -11,6 +11,8 @@ contract MarketFactory is AccessControl {
     mapping(uint256 => address) public markets;
     // notice Ordered list of all deployed market addresses.
     address[] public allMarkets;
+    // notice Tracks which CREATE2 salts have already been used to prevent collisions.
+    mapping(bytes32 => bool) public usedSalts;
     // notice Address of the shared ERC-1155 outcome-share token contract.
     address public immutable outcomeShareToken;
     event MarketDeployed(
@@ -50,6 +52,8 @@ contract MarketFactory is AccessControl {
         onlyRole(MARKET_CREATOR_ROLE)
         returns (uint256 marketId, address marketAddr)
     {
+        require(!usedSalts[salt], "MF: salt already used");
+        usedSalts[salt] = true;
         marketId = marketCount++;
         // CREATE2: address = keccak256(0xff ++ factory ++ salt ++ keccak256(initcode))
         Market market = new Market{salt: salt}(marketId, question, resolutionTime, outcomeShareToken, msg.sender);
