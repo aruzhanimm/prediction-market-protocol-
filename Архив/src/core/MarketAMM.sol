@@ -244,23 +244,17 @@ contract MarketAMM is ERC20, ReentrancyGuard {
 
     //  Internal helpers
     /// @dev uint → decimal string (used in constructor for LP token name/symbol).
-    ///      Fixed: original had two while-loops with no body (len never incremented,
-    ///      n never divided), causing infinite loops for any n > 0.
     function _uint2str(uint256 n) private pure returns (string memory) {
         if (n == 0) return "0";
         uint256 j = n;
         uint256 len;
-        while (j != 0) {
-            len++;
-            j /= 10;
-        }
+        while (j != 0) len++;
+        j /= 10;
         bytes memory bstr = new bytes(len);
         uint256 k = len;
-        while (n != 0) {
-            k--;
-            bstr[k] = bytes1(uint8(48 + n % 10));
-            n /= 10;
-        }
+        while (n != 0) k--;
+        bstr[k] = bytes1(uint8(48 + n % 10));
+        n /= 10;
         return string(bstr);
     }
 }
