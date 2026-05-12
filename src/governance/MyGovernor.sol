@@ -4,11 +4,13 @@ import {Governor} from "@openzeppelin/contracts/governance/Governor.sol";
 import {GovernorSettings} from "@openzeppelin/contracts/governance/extensions/GovernorSettings.sol";
 import {GovernorCountingSimple} from "@openzeppelin/contracts/governance/extensions/GovernorCountingSimple.sol";
 import {GovernorVotes} from "@openzeppelin/contracts/governance/extensions/GovernorVotes.sol";
-import {GovernorVotesQuorumFraction} from
-    "@openzeppelin/contracts/governance/extensions/GovernorVotesQuorumFraction.sol";
+import {
+    GovernorVotesQuorumFraction
+} from "@openzeppelin/contracts/governance/extensions/GovernorVotesQuorumFraction.sol";
 import {GovernorTimelockControl} from "@openzeppelin/contracts/governance/extensions/GovernorTimelockControl.sol";
 import {IVotes} from "@openzeppelin/contracts/governance/utils/IVotes.sol";
 import {TimelockController} from "@openzeppelin/contracts/governance/TimelockController.sol";
+
 contract MyGovernor is
     Governor,
     GovernorSettings,
@@ -34,6 +36,7 @@ contract MyGovernor is
         GovernorVotesQuorumFraction(QUORUM_FRACTION)
         GovernorTimelockControl(_timelock)
     {}
+
     /// @inheritdoc Governor
     function proposalThreshold() public view override(Governor, GovernorSettings) returns (uint256) {
         // 1% of the total supply at the current block snapshot
@@ -42,32 +45,27 @@ contract MyGovernor is
         uint256 supply = token().getPastTotalSupply(clock() - 1);
         return supply / 100;
     }
+
     /// @inheritdoc Governor
     function votingDelay() public view override(Governor, GovernorSettings) returns (uint256) {
         return super.votingDelay();
     }
+
     /// @inheritdoc Governor
     function votingPeriod() public view override(Governor, GovernorSettings) returns (uint256) {
         return super.votingPeriod();
     }
+
     /// @inheritdoc GovernorVotesQuorumFraction
-    function quorum(uint256 blockNumber)
-        public
-        view
-        override(Governor, GovernorVotesQuorumFraction)
-        returns (uint256)
-    {
+    function quorum(uint256 blockNumber) public view override(Governor, GovernorVotesQuorumFraction) returns (uint256) {
         return super.quorum(blockNumber);
     }
+
     /// @inheritdoc GovernorTimelockControl
-    function state(uint256 proposalId)
-        public
-        view
-        override(Governor, GovernorTimelockControl)
-        returns (ProposalState)
-    {
+    function state(uint256 proposalId) public view override(Governor, GovernorTimelockControl) returns (ProposalState) {
         return super.state(proposalId);
     }
+
     /// @inheritdoc GovernorTimelockControl
     function proposalNeedsQueuing(uint256 proposalId)
         public
@@ -77,6 +75,7 @@ contract MyGovernor is
     {
         return super.proposalNeedsQueuing(proposalId);
     }
+
     /// @inheritdoc GovernorTimelockControl
     function _queueOperations(
         uint256 proposalId,
@@ -87,6 +86,7 @@ contract MyGovernor is
     ) internal override(Governor, GovernorTimelockControl) returns (uint48) {
         return super._queueOperations(proposalId, targets, values, calldatas, descriptionHash);
     }
+
     /// @inheritdoc GovernorTimelockControl
     function _executeOperations(
         uint256 proposalId,
@@ -97,6 +97,7 @@ contract MyGovernor is
     ) internal override(Governor, GovernorTimelockControl) {
         super._executeOperations(proposalId, targets, values, calldatas, descriptionHash);
     }
+
     /// @inheritdoc GovernorTimelockControl
     function _cancel(
         address[] memory targets,
@@ -106,6 +107,7 @@ contract MyGovernor is
     ) internal override(Governor, GovernorTimelockControl) returns (uint256) {
         return super._cancel(targets, values, calldatas, descriptionHash);
     }
+
     /// @inheritdoc GovernorTimelockControl
     function _executor() internal view override(Governor, GovernorTimelockControl) returns (address) {
         return super._executor();
