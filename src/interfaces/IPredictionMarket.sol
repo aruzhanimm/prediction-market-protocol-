@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+
 /// @notice Interface for the upgradeable PredictionMarket core contract.
 interface IPredictionMarket {
     enum MarketStatus {
@@ -7,6 +8,7 @@ interface IPredictionMarket {
         Resolved,
         Cancelled
     }
+
     struct MarketData {
         uint256 marketId;
         string question;

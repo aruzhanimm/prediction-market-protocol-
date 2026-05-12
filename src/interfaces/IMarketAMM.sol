@@ -1,13 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
+
 /// @notice Interface for the per-market constant-product AMM.
 interface IMarketAMM {
     event LiquidityAdded(address indexed provider, uint256 yesAmount, uint256 noAmount, uint256 lpMinted);
     event LiquidityRemoved(address indexed provider, uint256 yesAmount, uint256 noAmount, uint256 lpBurned);
     event Swap(address indexed trader, bool buyYes, uint256 amountIn, uint256 amountOut);
-    function addLiquidity(uint256 yesAmount, uint256 noAmount, uint256 minLPOut)
-        external
-        returns (uint256 lpMinted);
+    function addLiquidity(uint256 yesAmount, uint256 noAmount, uint256 minLPOut) external returns (uint256 lpMinted);
     function removeLiquidity(uint256 lpAmount, uint256 minYesOut, uint256 minNoOut)
         external
         returns (uint256 yesOut, uint256 noOut);

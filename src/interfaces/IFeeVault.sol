@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 import {IERC4626} from "@openzeppelin/contracts/interfaces/IERC4626.sol";
+
 /// @notice Interface for the ERC-4626 fee vault that holds MarketAMM LP tokens.
 interface IFeeVault is IERC4626 {
     event Harvested(address indexed caller, uint256 yieldAmount);
