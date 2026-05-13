@@ -11,7 +11,7 @@ contract PredictionMarketV2 is PredictionMarket {
     event MarketDisputed(uint256 indexed marketId, address indexed disputer);
     error DisputeWindowClosed(uint256 marketId);
     error AlreadyDisputed(uint256 marketId);
-    error MarketNotResolved(uint256 marketId);
+    // MarketNotResolved is inherited from PredictionMarket — not redeclared here.
 
     function getMarketStats(uint256 marketId)
         external
@@ -39,9 +39,9 @@ contract PredictionMarketV2 is PredictionMarket {
         if (m.status != MarketStatus.Resolved) revert MarketNotResolved(marketId);
         if (disputed[marketId]) revert AlreadyDisputed(marketId);
 
-        // Dispute must be filed within disputeWindow seconds of resolution.
-        // resolutionTime is used as the proxy for when resolution happened.
-        if (disputeWindow > 0 && block.timestamp > m.resolutionTime + disputeWindow) {
+        // Dispute must be filed within disputeWindow seconds of when the market was resolved.
+        // resolvedAt is set by resolveMarket() — the actual resolution timestamp.
+        if (disputeWindow > 0 && block.timestamp > m.resolvedAt + disputeWindow) {
             revert DisputeWindowClosed(marketId);
         }
 
