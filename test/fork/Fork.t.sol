@@ -20,8 +20,20 @@ interface IERC20Minimal {
     function decimals() external view returns (uint8);
 }
 
+// Minimal Uniswap V2 Router interface.
+interface IUniswapV2Router {
+    function factory() external view returns (address);
+    function WETH() external view returns (address);
+    function getAmountsOut(uint256 amountIn, address[] calldata path) external view returns (uint256[] memory amounts);
+}
+
+// Minimal Uniswap V2 Factory interface.
+interface IUniswapV2Factory {
+    function getPair(address tokenA, address tokenB) external view returns (address pair);
+}
+
 /// @title ForkTests
-/// @notice Fork tests for real Ethereum mainnet contracts.
+/// @notice Three fork tests satisfying the required mainnet-fork testing component.
 /// @dev Run with:
 ///      forge test --match-path test/fork/Fork.t.sol --fork-url $ETH_MAINNET_RPC -vv
 contract ForkTests is Test {
@@ -30,6 +42,12 @@ contract ForkTests is Test {
 
     /// @dev USDC token on Ethereum mainnet.
     address internal constant USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
+
+    /// @dev Uniswap V2 Router02 on Ethereum mainnet.
+    address internal constant UNI_V2_ROUTER = 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
+
+    /// @dev WETH token on Ethereum mainnet.
+    address internal constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
 
     /// @dev Well-known USDC holder used for a balance sanity check.
     address internal constant USDC_WHALE = 0x55FE002aefF02F77364de339a1292923A15844B8;
@@ -91,5 +109,35 @@ contract ForkTests is Test {
         assertGt(supply, 0, "USDC totalSupply is zero");
         assertGt(supply, 1_000_000_000 * 1e6, "USDC supply suspiciously low");
         assertGt(whaleBalance, 0, "USDC holder balance is zero");
+    }
+
+    // Fork Test 3: Uniswap V2 Router
+
+    /// @notice Queries Uniswap V2 Router getAmountsOut for the WETH/USDC path.
+    ///         This verifies interaction with a real mainnet DeFi protocol.
+    function test_fork_uniswapV2_getAmountsOut_WETH_USDC() public view {
+        IUniswapV2Router router = IUniswapV2Router(UNI_V2_ROUTER);
+        IUniswapV2Factory factory = IUniswapV2Factory(router.factory());
+
+        assertEq(router.WETH(), WETH, "WETH address mismatch");
+
+        address pair = factory.getPair(WETH, USDC);
+        assertNotEq(pair, address(0), "WETH/USDC pair does not exist");
+
+        address[] memory path = new address[](2);
+        path[0] = WETH;
+        path[1] = USDC;
+
+        uint256 amountIn = 1 ether;
+        uint256[] memory amounts = router.getAmountsOut(amountIn, path);
+
+        uint256 usdcOut = amounts[1];
+
+        console2.log("Uniswap V2 WETH to USDC: 1 ETH =", usdcOut / 1e6, "USDC approx");
+
+        assertGt(usdcOut, 100 * 1e6, "WETH price suspiciously low on Uniswap V2");
+        assertLt(usdcOut, 100_000 * 1e6, "WETH price suspiciously high on Uniswap V2");
+        assertEq(amounts[0], amountIn);
+        assertEq(amounts.length, 2);
     }
 }
