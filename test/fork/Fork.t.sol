@@ -13,6 +13,13 @@ interface IChainlinkFeed {
     function decimals() external view returns (uint8);
 }
 
+// Minimal ERC-20 interface for fork tests.
+interface IERC20Minimal {
+    function totalSupply() external view returns (uint256);
+    function balanceOf(address account) external view returns (uint256);
+    function decimals() external view returns (uint8);
+}
+
 /// @title ForkTests
 /// @notice Fork tests for real Ethereum mainnet contracts.
 /// @dev Run with:
@@ -21,11 +28,22 @@ contract ForkTests is Test {
     /// @dev Chainlink ETH/USD feed on Ethereum mainnet.
     address internal constant CHAINLINK_ETH_USD = 0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419;
 
+    /// @dev USDC token on Ethereum mainnet.
+    address internal constant USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
+
+    /// @dev Well-known USDC holder used for a balance sanity check.
+    address internal constant USDC_WHALE = 0x55FE002aefF02F77364de339a1292923A15844B8;
+
     string internal mainnetRpc;
     uint256 internal forkId;
 
     function setUp() public {
-        mainnetRpc = vm.envOr("ETH_MAINNET_RPC", string("https://eth.llamarpc.com"));
+        mainnetRpc = vm.envOr("ETH_MAINNET_RPC", string(""));
+
+        if (bytes(mainnetRpc).length == 0) {
+            vm.skip(true);
+        }
+
         forkId = vm.createFork(mainnetRpc);
         vm.selectFork(forkId);
     }
@@ -34,7 +52,7 @@ contract ForkTests is Test {
 
     /// @notice Reads the Chainlink ETH/USD price feed on mainnet.
     ///         Validates that the answer is positive, reasonable, complete, and fresh.
-    function test_fork_chainlinkEthUsd_latestAnswer() public {
+    function test_fork_chainlinkEthUsd_latestAnswer() public view {
         IChainlinkFeed feed = IChainlinkFeed(CHAINLINK_ETH_USD);
 
         (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound) =
@@ -45,23 +63,33 @@ contract ForkTests is Test {
         console2.log("ETH/USD updatedAt:", updatedAt);
         console2.log("ETH/USD decimals:", feed.decimals());
 
-        // Price must be positive.
         assertGt(answer, 0, "ETH/USD price not positive");
-
-        // Sanity range: $100 to $100,000 with 8 decimals.
         assertGt(answer, 100e8, "ETH price suspiciously low");
         assertLt(answer, 100_000e8, "ETH price suspiciously high");
-
-        // Chainlink round completeness check.
         assertGe(answeredInRound, roundId, "Incomplete round");
-
-        // Price should be updated within the last 2 hours.
         assertLt(block.timestamp - updatedAt, 7200, "Price is stale");
-
-        // startedAt must not be after updatedAt.
         assertLe(startedAt, updatedAt);
-
-        // ETH/USD Chainlink feed uses 8 decimals.
         assertEq(feed.decimals(), 8);
+    }
+
+    // Fork Test 2: USDC ERC-20
+
+    /// @notice Reads USDC totalSupply and a known holder balance on mainnet.
+    ///         Confirms that ERC-20 reads work correctly on a fork.
+    function test_fork_usdc_totalSupplyAndBalance() public view {
+        IERC20Minimal usdc = IERC20Minimal(USDC);
+
+        uint256 supply = usdc.totalSupply();
+        uint256 whaleBalance = usdc.balanceOf(USDC_WHALE);
+        uint8 dec = usdc.decimals();
+
+        console2.log("USDC totalSupply raw:", supply);
+        console2.log("USDC holder balance:", whaleBalance);
+        console2.log("USDC decimals:", dec);
+
+        assertEq(dec, 6, "USDC decimals should be 6");
+        assertGt(supply, 0, "USDC totalSupply is zero");
+        assertGt(supply, 1_000_000_000 * 1e6, "USDC supply suspiciously low");
+        assertGt(whaleBalance, 0, "USDC holder balance is zero");
     }
 }
