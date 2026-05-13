@@ -11,7 +11,6 @@ contract PredictionMarketV2 is PredictionMarket {
     event MarketDisputed(uint256 indexed marketId, address indexed disputer);
     error DisputeWindowClosed(uint256 marketId);
     error AlreadyDisputed(uint256 marketId);
-    error MarketNotResolved(uint256 marketId);
 
     function getMarketStats(uint256 marketId)
         external
