@@ -46,6 +46,8 @@ jobs:
 
       - name: Run all tests
         run: forge test -vvv
+        env:
+          ETH_MAINNET_RPC: ${{ secrets.ETH_MAINNET_RPC }}
 
       # Coverage
       - name: Generate coverage report
