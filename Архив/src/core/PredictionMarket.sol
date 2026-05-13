@@ -46,6 +46,8 @@ contract PredictionMarket is Initializable, AccessControl, ReentrancyGuard, UUPS
         bool outcome;
         address creator;
         uint256 totalShares;
+        /// @notice Timestamp when resolveMarket() was actually called. 0 if not yet resolved.
+        uint256 resolvedAt;
     }
 
     /// @notice Sequential counter used as the next market ID.
@@ -143,6 +145,7 @@ contract PredictionMarket is Initializable, AccessControl, ReentrancyGuard, UUPS
 
         market.status = MarketStatus.Resolved;
         market.outcome = _outcome;
+        market.resolvedAt = block.timestamp;
 
         emit MarketResolved(marketId, _outcome);
     }

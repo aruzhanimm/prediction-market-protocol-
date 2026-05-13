@@ -81,8 +81,9 @@ contract FeeVault is ERC20, IERC4626, ReentrancyGuard, Ownable {
         shares = previewDeposit(assets);
         require(shares > 0, "FeeVault: zero shares");
 
-        _mint(receiver, shares);
+        // CEI: pull assets first, then mint shares
         _asset.safeTransferFrom(msg.sender, address(this), assets);
+        _mint(receiver, shares);
 
         emit Deposit(msg.sender, receiver, assets, shares);
     }
@@ -105,8 +106,9 @@ contract FeeVault is ERC20, IERC4626, ReentrancyGuard, Ownable {
 
         assets = previewMint(shares);
 
-        _mint(receiver, shares);
+        // CEI: pull assets first, then mint shares
         _asset.safeTransferFrom(msg.sender, address(this), assets);
+        _mint(receiver, shares);
 
         emit Deposit(msg.sender, receiver, assets, shares);
     }

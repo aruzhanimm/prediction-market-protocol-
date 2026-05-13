@@ -49,5 +49,3 @@ contract PredictionMarketV2 is PredictionMarket {
         emit MarketDisputed(marketId, msg.sender);
     }
 }
-
-// check 
