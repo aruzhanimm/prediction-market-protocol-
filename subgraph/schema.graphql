@@ -1,4 +1,4 @@
-type Market @entity {
+type Market @entity(immutable: false) {
   id: ID!
   marketId: BigInt!
   creator: Bytes!
@@ -11,7 +11,7 @@ type Market @entity {
   txHash: Bytes!
 }
 
-type Trade @entity {
+type Trade @entity(immutable: false) {
   id: ID!
   market: String!
   trader: Bytes!
@@ -23,7 +23,7 @@ type Trade @entity {
   blockNumber: BigInt!
 }
 
-type LiquidityPosition @entity {
+type LiquidityPosition @entity(immutable: false) {
   id: ID!
   market: String!
   provider: Bytes!
@@ -33,7 +33,7 @@ type LiquidityPosition @entity {
   lastUpdated: BigInt!
 }
 
-type GovernanceProposal @entity {
+type GovernanceProposal @entity(immutable: false) {
   id: ID!
   proposalId: BigInt!
   proposer: Bytes!

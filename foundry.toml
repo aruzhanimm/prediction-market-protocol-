@@ -10,10 +10,10 @@ remappings = [
 optimizer = true
 optimizer_runs = 200
 solc_version = "0.8.24"
- 
+
+[rpc_endpoints]
+mainnet = "${ETH_MAINNET_RPC}"
+
 [profile.ci]
 fuzz = { runs = 256 }
 invariant = { runs = 64 }
- 
-# See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
- 
