@@ -86,6 +86,9 @@ function humanizeError(error) {
     return "Transaction reverted. Check token balances, approvals, proposal state, or input values.";
   }
 
+  if (text.includes("max fee per gas less than block base fee")) {
+    return "Gas fee is too low for the current block. Please retry the transaction or increase Max Fee in MetaMask.";
+  }
   return "Operation failed. Please check wallet, network, balances, approvals, and input values.";
 }
 
@@ -216,7 +219,7 @@ async function delegateVotes() {
     const input = $("delegateToInput").value.trim();
     const delegatee = input || userAddress;
 
-    const tx = await govToken.delegate(delegatee);
+    const tx = await govToken.delegate(delegatee, await getGasOverrides());
     setStatus(`Delegate transaction sent: ${tx.hash}`);
 
     await tx.wait();
@@ -234,7 +237,11 @@ async function approveAmm() {
     requireWallet();
 
     const { outcomeToken } = getContracts();
-    const tx = await outcomeToken.setApprovalForAll(CONFIG.addresses.marketAMM, true);
+    const tx = await outcomeToken.setApprovalForAll(
+        CONFIG.addresses.marketAMM,
+        true,
+        await getGasOverrides()
+    );
 
     setStatus(`Approval transaction sent: ${tx.hash}`);
     await tx.wait();
@@ -262,7 +269,7 @@ async function addLiquidity() {
     const noAmount = ethers.parseEther(noInput);
 
     const { amm } = getContracts();
-    const tx = await amm.addLiquidity(yesAmount, noAmount, 0);
+    const tx = await amm.addLiquidity(yesAmount, noAmount, 0, await getGasOverrides());
 
     setStatus(`Add liquidity transaction sent: ${tx.hash}`);
     await tx.wait();
@@ -290,7 +297,7 @@ async function swap() {
     const amountIn = ethers.parseEther(amountInput);
 
     const { amm } = getContracts();
-    const tx = await amm.swap(buyYes, amountIn, 0);
+    const tx = await amm.swap(buyYes, amountIn, 0, await getGasOverrides());
 
     setStatus(`Swap transaction sent: ${tx.hash}`);
     await tx.wait();
@@ -337,7 +344,7 @@ async function vote(support) {
     }
 
     const { governor } = getContracts();
-    const tx = await governor.castVote(proposalId, support);
+    const tx = await governor.castVote(proposalId, support, await getGasOverrides());
 
     setStatus(`Vote transaction sent: ${tx.hash}`);
     await tx.wait();
@@ -521,6 +528,25 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+async function getGasOverrides() {
+  const feeData = await provider.getFeeData();
+
+  if (feeData.maxFeePerGas && feeData.maxPriorityFeePerGas) {
+    return {
+      maxFeePerGas: (feeData.maxFeePerGas * 130n) / 100n,
+      maxPriorityFeePerGas: (feeData.maxPriorityFeePerGas * 130n) / 100n,
+    };
+  }
+
+  if (feeData.gasPrice) {
+    return {
+      gasPrice: (feeData.gasPrice * 130n) / 100n,
+    };
+  }
+
+  return {};
 }
 
 function setupListeners() {
