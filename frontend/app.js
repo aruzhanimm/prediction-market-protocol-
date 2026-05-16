@@ -1,8 +1,12 @@
 let provider;
 let signer;
 let userAddress;
+let wcProvider; // WalletConnect provider instance
 
 const CONFIG = window.APP_CONFIG;
+
+// WalletConnect Project ID — get yours free at https://cloud.walletconnect.com
+const WC_PROJECT_ID = "b56e18d47c72ab683b10814fe9495694";
 
 const stateNames = [
   "Pending",
@@ -89,14 +93,17 @@ function humanizeError(error) {
   if (text.includes("max fee per gas less than block base fee")) {
     return "Gas fee is too low for the current block. Please retry the transaction or increase Max Fee in MetaMask.";
   }
+
   return "Operation failed. Please check wallet, network, balances, approvals, and input values.";
 }
+
+// ─── MetaMask ────────────────────────────────────────────────────────────────
 
 async function connectWallet() {
   clearError();
 
   if (!window.ethereum) {
-    showError("MetaMask is not installed.");
+    showError("MetaMask is not installed. Try WalletConnect instead.");
     return;
   }
 
@@ -106,11 +113,81 @@ async function connectWallet() {
   userAddress = await signer.getAddress();
 
   $("walletAddress").textContent = userAddress;
-  setStatus("Wallet connected.");
+  $("connectorType").textContent = "MetaMask";
+  setStatus("MetaMask connected.");
 
   await checkNetwork();
   await refreshReads();
 }
+
+// ─── WalletConnect ───────────────────────────────────────────────────────────
+
+async function connectWalletConnect() {
+  clearError();
+
+  try {
+    setStatus("Initializing WalletConnect...");
+
+    // Initialize WalletConnect EthereumProvider
+    wcProvider = await window["@walletconnect/ethereum-provider"].EthereumProvider.init({
+      projectId: WC_PROJECT_ID,
+      chains: [CONFIG.chain.chainIdDecimal],
+      showQrModal: true,
+      qrModalOptions: {
+        themeMode: "dark",
+      },
+      metadata: {
+        name: "Prediction Market Protocol",
+        description: "On-Chain Prediction Market dApp",
+        url: window.location.origin,
+        icons: [],
+      },
+    });
+
+    // Connect — shows QR code modal
+    await wcProvider.connect();
+
+    // Wrap with ethers
+    provider = new ethers.BrowserProvider(wcProvider);
+    signer = await provider.getSigner();
+    userAddress = await signer.getAddress();
+
+    $("walletAddress").textContent = userAddress;
+    $("connectorType").textContent = "WalletConnect";
+    setStatus("WalletConnect connected.");
+
+    // Listen for disconnect
+    wcProvider.on("disconnect", () => {
+      provider = null;
+      signer = null;
+      userAddress = null;
+      $("walletAddress").textContent = "Disconnected";
+      $("connectorType").textContent = "-";
+      $("networkStatus").textContent = "Unknown";
+      setStatus("WalletConnect disconnected.");
+    });
+
+    wcProvider.on("accountsChanged", (accounts) => {
+      userAddress = accounts[0];
+      $("walletAddress").textContent = userAddress;
+    });
+
+    wcProvider.on("chainChanged", () => {
+      window.location.reload();
+    });
+
+    await checkNetwork();
+    await refreshReads();
+  } catch (error) {
+    if (String(error?.message).includes("User closed")) {
+      setStatus("WalletConnect modal closed.");
+    } else {
+      showError(error);
+    }
+  }
+}
+
+// ─── Network ─────────────────────────────────────────────────────────────────
 
 async function checkNetwork() {
   const network = await provider.getNetwork();
@@ -128,8 +205,22 @@ async function checkNetwork() {
 async function switchNetwork() {
   clearError();
 
+  // If connected via WalletConnect, request chain switch through wcProvider
+  if (wcProvider && !window.ethereum) {
+    try {
+      await wcProvider.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: CONFIG.chain.chainIdHex }],
+      });
+      await checkNetwork();
+    } catch (error) {
+      showError("Please switch to Arbitrum Sepolia in your wallet app.");
+    }
+    return;
+  }
+
   if (!window.ethereum) {
-    showError("MetaMask is not installed.");
+    showError("No wallet connected.");
     return;
   }
 
@@ -155,9 +246,11 @@ async function switchNetwork() {
   await checkNetwork();
 }
 
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
 function requireWallet() {
   if (!provider || !signer || !userAddress) {
-    throw new Error("Connect MetaMask first.");
+    throw new Error("Connect wallet first (MetaMask or WalletConnect).");
   }
 }
 
@@ -170,6 +263,27 @@ function getContracts() {
 
   return { govToken, outcomeToken, amm, governor, vault };
 }
+
+async function getGasOverrides() {
+  const feeData = await provider.getFeeData();
+
+  if (feeData.maxFeePerGas && feeData.maxPriorityFeePerGas) {
+    return {
+      maxFeePerGas: (feeData.maxFeePerGas * 130n) / 100n,
+      maxPriorityFeePerGas: (feeData.maxPriorityFeePerGas * 130n) / 100n,
+    };
+  }
+
+  if (feeData.gasPrice) {
+    return {
+      gasPrice: (feeData.gasPrice * 130n) / 100n,
+    };
+  }
+
+  return {};
+}
+
+// ─── Reads ────────────────────────────────────────────────────────────────────
 
 async function refreshReads() {
   clearError();
@@ -209,6 +323,8 @@ async function refreshReads() {
   }
 }
 
+// ─── Write functions ──────────────────────────────────────────────────────────
+
 async function delegateVotes() {
   clearError();
 
@@ -238,9 +354,9 @@ async function approveAmm() {
 
     const { outcomeToken } = getContracts();
     const tx = await outcomeToken.setApprovalForAll(
-        CONFIG.addresses.marketAMM,
-        true,
-        await getGasOverrides()
+      CONFIG.addresses.marketAMM,
+      true,
+      await getGasOverrides()
     );
 
     setStatus(`Approval transaction sent: ${tx.hash}`);
@@ -309,6 +425,8 @@ async function swap() {
   }
 }
 
+// ─── Governance ───────────────────────────────────────────────────────────────
+
 async function getProposalState() {
   clearError();
 
@@ -356,6 +474,8 @@ async function vote(support) {
   }
 }
 
+// ─── Subgraph ─────────────────────────────────────────────────────────────────
+
 async function loadSubgraphData() {
   clearError();
 
@@ -397,9 +517,7 @@ async function loadSubgraphData() {
 
     const response = await fetch(CONFIG.subgraphUrl, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ query }),
     });
 
@@ -416,6 +534,7 @@ async function loadSubgraphData() {
     showError(error);
   }
 }
+
 function renderSubgraphData(data) {
   renderMarkets(data.markets || []);
   renderTrades(data.trades || []);
@@ -491,7 +610,7 @@ function renderProposals(proposals) {
     .map((proposal) => {
       return `
         <div class="list-item">
-          <p><strong>Proposal ID:</strong> ${proposal.proposalId}</p>
+          <p><strong>Proposal ID:</strong> <span class="proposal-id">${proposal.proposalId}</span></p>
           <p>${escapeHtml(proposal.description || "No description")}</p>
           <p>State: <span class="pill">${proposal.state}</span></p>
           <p>For: ${proposal.forVotes}</p>
@@ -513,11 +632,10 @@ function renderProposals(proposals) {
   });
 }
 
-function shortAddress(address) {
-  if (!address || address.length < 10) {
-    return address || "-";
-  }
+// ─── Utils ────────────────────────────────────────────────────────────────────
 
+function shortAddress(address) {
+  if (!address || address.length < 10) return address || "-";
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
 
@@ -530,27 +648,11 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-async function getGasOverrides() {
-  const feeData = await provider.getFeeData();
-
-  if (feeData.maxFeePerGas && feeData.maxPriorityFeePerGas) {
-    return {
-      maxFeePerGas: (feeData.maxFeePerGas * 130n) / 100n,
-      maxPriorityFeePerGas: (feeData.maxPriorityFeePerGas * 130n) / 100n,
-    };
-  }
-
-  if (feeData.gasPrice) {
-    return {
-      gasPrice: (feeData.gasPrice * 130n) / 100n,
-    };
-  }
-
-  return {};
-}
+// ─── Event listeners ──────────────────────────────────────────────────────────
 
 function setupListeners() {
   $("connectWalletBtn").addEventListener("click", connectWallet);
+  $("connectWalletConnectBtn").addEventListener("click", connectWalletConnect);
   $("switchNetworkBtn").addEventListener("click", switchNetwork);
   $("refreshReadsBtn").addEventListener("click", refreshReads);
   $("delegateBtn").addEventListener("click", delegateVotes);

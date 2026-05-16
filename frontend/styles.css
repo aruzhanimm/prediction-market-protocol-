@@ -204,3 +204,28 @@ pre {
     grid-template-columns: 1fr;
   }
 }
+
+.list-item {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.list-item p {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+#proposalIdInput {
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.proposal-id {
+  display: block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  font-size: 13px;
+  color: var(--muted);
+}

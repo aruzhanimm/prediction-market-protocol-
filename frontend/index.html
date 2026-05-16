@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="./styles.css" />
     <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.5/dist/ethers.umd.min.js"></script>
+    <script>window.process = { env: {} }; window.global = window;</script>
+    <script src="https://cdn.jsdelivr.net/npm/@walletconnect/modal@2.6.2/dist/index.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@walletconnect/ethereum-provider@2.11.2/dist/index.umd.js"></script>
   </head>
   <body>
     <main class="container">
@@ -18,26 +21,24 @@
             transactions, governance voting, and subgraph data.
           </p>
         </div>
-
         <div class="wallet-card">
           <button id="connectWalletBtn">Connect MetaMask</button>
+          <button id="connectWalletConnectBtn" class="secondary">Connect WalletConnect</button>
           <button id="switchNetworkBtn" class="secondary">Switch to Arbitrum Sepolia</button>
           <p><strong>Wallet:</strong> <span id="walletAddress">Not connected</span></p>
           <p><strong>Network:</strong> <span id="networkStatus">Unknown</span></p>
+          <p><strong>Connector:</strong> <span id="connectorType">-</span></p>
         </div>
       </header>
-
       <section class="status-panel">
         <div id="statusMessage" class="status">Ready.</div>
         <div id="errorMessage" class="error hidden"></div>
       </section>
-
       <section class="grid">
         <article class="card">
           <h2>Protocol Reads</h2>
           <p>Reads token balance, voting power, delegate address, AMM reserves, and vault state.</p>
           <button id="refreshReadsBtn">Refresh Reads</button>
-
           <div class="data-list">
             <p><strong>PRED balance:</strong> <span id="predBalance">-</span></p>
             <p><strong>Voting power:</strong> <span id="votingPower">-</span></p>
@@ -49,29 +50,24 @@
             <p><strong>Vault total assets:</strong> <span id="vaultTotalAssets">-</span></p>
           </div>
         </article>
-
         <article class="card">
           <h2>Transactions</h2>
           <p>State-changing actions from the UI.</p>
-
           <div class="form-row">
             <label>Delegate to</label>
             <input id="delegateToInput" placeholder="0x... or leave empty for self" />
             <button id="delegateBtn">Delegate Votes</button>
           </div>
-
           <div class="form-row">
             <label>Approve AMM for ERC-1155 outcome tokens</label>
             <button id="approveAmmBtn">Approve AMM</button>
           </div>
-
           <div class="form-row">
             <label>Add Liquidity</label>
             <input id="yesAmountInput" placeholder="YES amount, e.g. 1" />
             <input id="noAmountInput" placeholder="NO amount, e.g. 1" />
             <button id="addLiquidityBtn">Add Liquidity</button>
           </div>
-
           <div class="form-row">
             <label>Swap</label>
             <select id="swapDirectionInput">
@@ -82,61 +78,46 @@
             <button id="swapBtn">Swap</button>
           </div>
         </article>
-
         <article class="card">
           <h2>Governance</h2>
           <p>Check proposal state and vote on active proposals.</p>
-
           <div class="form-row">
             <label>Proposal ID</label>
             <input id="proposalIdInput" placeholder="Paste proposalId from subgraph or event" />
             <button id="proposalStateBtn">Get Proposal State</button>
           </div>
-
           <p><strong>Proposal state:</strong> <span id="proposalState">-</span></p>
-
           <div class="button-row">
             <button data-support="0" class="voteBtn">Vote Against</button>
             <button data-support="1" class="voteBtn">Vote For</button>
             <button data-support="2" class="voteBtn">Vote Abstain</button>
           </div>
         </article>
-
         <article class="card wide-card">
-            <h2>Subgraph Data</h2>
-            <p>
-              Loads indexed markets, trades, and governance proposals from The Graph.
-              This section proves that the frontend uses the subgraph, not only direct contract calls.
-            </p>
-
-            <button id="loadSubgraphBtn">Load Subgraph Data</button>
-
-            <div class="subgraph-grid">
-              <div>
-                <h3>Markets</h3>
-                <div id="marketsList" class="list-box">No markets loaded yet.</div>
-              </div>
-
-              <div>
-                <h3>Trades</h3>
-                <div id="tradesList" class="list-box">No trades loaded yet.</div>
-              </div>
-
-              <div>
-                <h3>Governance Proposals</h3>
-                <div id="proposalsList" class="list-box">No proposals loaded yet.</div>
-              </div>
+          <h2>Subgraph Data</h2>
+          <p>Loads indexed markets, trades, and governance proposals from The Graph.</p>
+          <button id="loadSubgraphBtn">Load Subgraph Data</button>
+          <div class="subgraph-grid">
+            <div>
+              <h3>Markets</h3>
+              <div id="marketsList" class="list-box">No markets loaded yet.</div>
+            </div>
+            <div>
+              <h3>Trades</h3>
+              <div id="tradesList" class="list-box">No trades loaded yet.</div>
+            </div>
+            <div>
+              <h3>Governance Proposals</h3>
+              <div id="proposalsList" class="list-box">No proposals loaded yet.</div>
             </div>
           </div>
-
-            <details class="raw-json">
-              <summary>Raw GraphQL response</summary>
-              <pre id="subgraphOutput">No raw data loaded yet.</pre>
-            </details>
+          <details class="raw-json">
+            <summary>Raw GraphQL response</summary>
+            <pre id="subgraphOutput">No raw data loaded yet.</pre>
+          </details>
         </article>
       </section>
     </main>
-
     <script src="./config.js"></script>
     <script src="./app.js"></script>
   </body>
