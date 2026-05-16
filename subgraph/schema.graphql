@@ -1,0 +1,50 @@
+type Market @entity {
+  id: ID!
+  marketId: BigInt!
+  creator: Bytes!
+  question: String!
+  resolutionTime: BigInt!
+  status: String!
+  outcome: Boolean
+  totalShares: BigInt!
+  createdAt: BigInt!
+  txHash: Bytes!
+}
+
+type Trade @entity {
+  id: ID!
+  market: String!
+  trader: Bytes!
+  buyYes: Boolean!
+  amountIn: BigInt!
+  amountOut: BigInt!
+  timestamp: BigInt!
+  txHash: Bytes!
+  blockNumber: BigInt!
+}
+
+type LiquidityPosition @entity {
+  id: ID!
+  market: String!
+  provider: Bytes!
+  lpTokens: BigInt!
+  yesDeposited: BigInt!
+  noDeposited: BigInt!
+  lastUpdated: BigInt!
+}
+
+type GovernanceProposal @entity {
+  id: ID!
+  proposalId: BigInt!
+  proposer: Bytes!
+  description: String!
+  state: String!
+  forVotes: BigInt!
+  againstVotes: BigInt!
+  abstainVotes: BigInt!
+  eta: BigInt
+  startBlock: BigInt!
+  endBlock: BigInt!
+  createdAt: BigInt!
+  txHash: Bytes!
+}
