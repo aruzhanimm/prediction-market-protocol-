@@ -162,3 +162,5 @@ contract SecurityTest is Test {
         treasury.withdrawETH(attacker, 1 ether);
     }
 }
+
+// апдейт
