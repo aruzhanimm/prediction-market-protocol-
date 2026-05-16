@@ -21,7 +21,7 @@ import {MyGovernor} from "../src/governance/MyGovernor.sol";
 import {Treasury} from "../src/governance/Treasury.sol";
 
 /// @title Deploy
-/// @notice Deploys the full prediction market protocol stack to an L2 testnet.
+/// @notice Deploys the full prediction market protocol stack to Arbitrum Sepolia.
 contract Deploy is Script {
     uint256 internal constant TIMELOCK_DELAY = 2 days;
     uint256 internal constant MARKET_ID = 0;
@@ -45,6 +45,8 @@ contract Deploy is Script {
 
     OutcomeShareToken internal outcomeToken;
 
+    MarketFactory internal marketFactory;
+
     PredictionMarket internal predictionMarketImpl;
     PredictionMarketV2 internal predictionMarketV2Impl;
     ERC1967Proxy internal predictionMarketProxy;
@@ -52,7 +54,6 @@ contract Deploy is Script {
 
     MarketAMM internal marketAMM;
     FeeVault internal feeVault;
-    MarketFactory internal marketFactory;
     ChainlinkResolver internal resolver;
 
     function run() external {
@@ -62,8 +63,9 @@ contract Deploy is Script {
 
         _deployGovernanceStack();
         _deployOutcomeToken();
+        _deployMarketFactory();
         _deployPredictionMarketProxy();
-        _deployAmmVaultFactoryAndResolver();
+        _deployAmmVaultAndResolver();
         _wireRolesAndPermissions();
 
         vm.stopBroadcast();
@@ -84,7 +86,7 @@ contract Deploy is Script {
         chainlinkFeed = vm.envAddress("CHAINLINK_FEED");
     }
 
-    /// @dev Deploys ERC20Votes token, Timelock, Governor, and Treasury.
+    /// @dev Deploys GovernanceToken, Timelock, Governor, and Treasury.
     function _deployGovernanceStack() internal {
         governanceToken = new GovernanceToken(teamWallet, treasuryWallet, communityWallet, liquidityWallet);
 
@@ -102,9 +104,14 @@ contract Deploy is Script {
         timelock.grantRole(timelock.EXECUTOR_ROLE(), address(0));
     }
 
-    /// @dev Deploys the ERC-1155 outcome share token.
+    /// @dev Deploys ERC-1155 YES/NO outcome token.
     function _deployOutcomeToken() internal {
         outcomeToken = new OutcomeShareToken(OUTCOME_BASE_URI, deployer);
+    }
+
+    /// @dev Deploys market factory before wiring it into PredictionMarket.
+    function _deployMarketFactory() internal {
+        marketFactory = new MarketFactory(address(outcomeToken), deployer);
     }
 
     /// @dev Deploys PredictionMarket V1 implementation, proxy, and V2 implementation.
@@ -120,18 +127,16 @@ contract Deploy is Script {
         predictionMarketV2Impl = new PredictionMarketV2();
     }
 
-    /// @dev Deploys protocol modules: AMM, vault, factory, and Chainlink resolver.
-    function _deployAmmVaultFactoryAndResolver() internal {
+    /// @dev Deploys AMM, ERC-4626 vault, and Chainlink resolver.
+    function _deployAmmVaultAndResolver() internal {
         marketAMM = new MarketAMM(address(outcomeToken), MARKET_ID);
 
         feeVault = new FeeVault(address(marketAMM), "Prediction Market LP Vault", "vPMLP", deployer);
 
-        marketFactory = new MarketFactory(address(outcomeToken), deployer);
-
         resolver = new ChainlinkResolver(chainlinkFeed, address(predictionMarket), ORACLE_STALENESS_THRESHOLD, deployer);
     }
 
-    /// @dev Grants required roles and connects deployed modules.
+    /// @dev Grants protocol roles and connects deployed modules.
     function _wireRolesAndPermissions() internal {
         bytes32 minterRole = outcomeToken.MINTER_ROLE();
 
@@ -152,9 +157,9 @@ contract Deploy is Script {
         timelock.renounceRole(timelock.DEFAULT_ADMIN_ROLE(), deployer);
     }
 
-    /// @dev Prints deployed addresses for README and deployment docs.
+    /// @dev Prints deployed addresses for README, deployment docs, and frontend config.
     function _logDeployment() internal view {
-        console2.log("=== Prediction Market Protocol Deployment ===");
+        console2.log("=== Prediction Market Protocol Deployment: Arbitrum Sepolia ===");
         console2.log("Deployer:", deployer);
 
         console2.log("GovernanceToken:", address(governanceToken));
@@ -163,6 +168,7 @@ contract Deploy is Script {
         console2.log("Treasury:", address(treasury));
 
         console2.log("OutcomeShareToken:", address(outcomeToken));
+        console2.log("MarketFactory:", address(marketFactory));
 
         console2.log("PredictionMarket implementation V1:", address(predictionMarketImpl));
         console2.log("PredictionMarket proxy:", address(predictionMarket));
@@ -170,7 +176,6 @@ contract Deploy is Script {
 
         console2.log("MarketAMM:", address(marketAMM));
         console2.log("FeeVault:", address(feeVault));
-        console2.log("MarketFactory:", address(marketFactory));
         console2.log("ChainlinkResolver:", address(resolver));
         console2.log("Chainlink feed:", chainlinkFeed);
     }

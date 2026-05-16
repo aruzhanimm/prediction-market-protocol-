@@ -1,13 +1,13 @@
-# Deployment Guide — Base Sepolia
+# Deployment Guide - Arbitrum Sepolia
 
 ## Network
 
 | Field | Value |
 |---|---|
-| Network | Base Sepolia |
-| Chain ID | 84532 |
-| Explorer | https://sepolia.basescan.org |
-| RPC environment variable | `BASE_SEPOLIA_RPC_URL` |
+| Network | Arbitrum Sepolia |
+| Chain ID | 421614 |
+| Explorer | https://sepolia.arbiscan.io |
+| RPC environment variable | `ARBITRUM_SEPOLIA_RPC_URL` |
 
 ## Required environment variables
 
@@ -15,8 +15,8 @@ Before deployment, set the following variables:
 
 ```powershell
 $env:PRIVATE_KEY="0xYOUR_PRIVATE_KEY"
-$env:BASE_SEPOLIA_RPC_URL="https://..."
-$env:BASESCAN_API_KEY="YOUR_BASESCAN_API_KEY"
+$env:ARBITRUM_SEPOLIA_RPC_URL="https://..."
+$env:ARBISCAN_API_KEY="YOUR_ARBISCAN_API_KEY"
 $env:CHAINLINK_FEED="0x..."
 ```
 
@@ -35,10 +35,10 @@ If optional wallet variables are not provided, the deployment script uses the de
 
 ```powershell
 forge script script/Deploy.s.sol:Deploy `
-  --rpc-url $env:BASE_SEPOLIA_RPC_URL `
+  --rpc-url $env:ARBITRUM_SEPOLIA_RPC_URL `
   --broadcast `
   --verify `
-  --etherscan-api-key $env:BASESCAN_API_KEY
+  --etherscan-api-key $env:ARBISCAN_API_KEY
 ```
 
 ## Post-deployment check
@@ -59,7 +59,7 @@ Run:
 
 ```powershell
 forge script script/PostDeployCheck.s.sol:PostDeployCheck `
-  --rpc-url $env:BASE_SEPOLIA_RPC_URL
+  --rpc-url $env:ARBITRUM_SEPOLIA_RPC_URL
 ```
 
 Expected output:
