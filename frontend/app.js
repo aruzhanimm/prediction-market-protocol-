@@ -402,11 +402,125 @@ async function loadSubgraphData() {
       throw new Error(json.errors.map((e) => e.message).join("\n"));
     }
 
+    renderSubgraphData(json.data);
     $("subgraphOutput").textContent = JSON.stringify(json.data, null, 2);
     setStatus("Subgraph data loaded.");
   } catch (error) {
     showError(error);
   }
+}
+function renderSubgraphData(data) {
+  renderMarkets(data.markets || []);
+  renderTrades(data.trades || []);
+  renderProposals(data.governanceProposals || []);
+}
+
+function renderMarkets(markets) {
+  const container = $("marketsList");
+
+  if (markets.length === 0) {
+    container.innerHTML = `<p class="empty-state">No markets indexed yet.</p>`;
+    return;
+  }
+
+  container.innerHTML = markets
+    .map((market) => {
+      const outcomeText =
+        market.outcome === null || market.outcome === undefined
+          ? "Not resolved"
+          : market.outcome
+            ? "YES"
+            : "NO";
+
+      return `
+        <div class="list-item">
+          <p><strong>Market #${market.marketId}</strong></p>
+          <p>${escapeHtml(market.question)}</p>
+          <p>Status: <span class="pill">${market.status}</span></p>
+          <p>Outcome: ${outcomeText}</p>
+          <p>Total shares: ${market.totalShares}</p>
+        </div>
+      `;
+    })
+    .join("");
+}
+
+function renderTrades(trades) {
+  const container = $("tradesList");
+
+  if (trades.length === 0) {
+    container.innerHTML = `<p class="empty-state">No trades indexed yet.</p>`;
+    return;
+  }
+
+  container.innerHTML = trades
+    .map((trade) => {
+      return `
+        <div class="list-item">
+          <p><strong>Trade</strong> ${trade.buyYes ? "Buy YES" : "Buy NO"}</p>
+          <p>Trader: ${shortAddress(trade.trader)}</p>
+          <p>Amount in: ${trade.amountIn}</p>
+          <p>Amount out: ${trade.amountOut}</p>
+          <p>Market: ${trade.market}</p>
+        </div>
+      `;
+    })
+    .join("");
+}
+
+function renderProposals(proposals) {
+  const container = $("proposalsList");
+
+  if (proposals.length === 0) {
+    container.innerHTML = `
+      <p class="empty-state">
+        No governance proposals indexed yet. Create a proposal first or paste proposalId manually.
+      </p>
+    `;
+    return;
+  }
+
+  container.innerHTML = proposals
+    .map((proposal) => {
+      return `
+        <div class="list-item">
+          <p><strong>Proposal ID:</strong> ${proposal.proposalId}</p>
+          <p>${escapeHtml(proposal.description || "No description")}</p>
+          <p>State: <span class="pill">${proposal.state}</span></p>
+          <p>For: ${proposal.forVotes}</p>
+          <p>Against: ${proposal.againstVotes}</p>
+          <p>Abstain: ${proposal.abstainVotes}</p>
+          <button class="useProposalBtn" data-proposal-id="${proposal.proposalId}">
+            Use Proposal
+          </button>
+        </div>
+      `;
+    })
+    .join("");
+
+  document.querySelectorAll(".useProposalBtn").forEach((button) => {
+    button.addEventListener("click", () => {
+      $("proposalIdInput").value = button.dataset.proposalId;
+      setStatus("Proposal ID copied into vote form.");
+    });
+  });
+}
+
+function shortAddress(address) {
+  if (!address || address.length < 10) {
+    return address || "-";
+  }
+
+  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
 function setupListeners() {

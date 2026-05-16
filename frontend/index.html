@@ -102,11 +102,37 @@
           </div>
         </article>
 
-        <article class="card">
-          <h2>Subgraph Data</h2>
-          <p>Loads indexed markets, trades, and governance proposals from The Graph.</p>
-          <button id="loadSubgraphBtn">Load Subgraph Data</button>
-          <pre id="subgraphOutput">No subgraph data loaded yet.</pre>
+        <article class="card wide-card">
+            <h2>Subgraph Data</h2>
+            <p>
+              Loads indexed markets, trades, and governance proposals from The Graph.
+              This section proves that the frontend uses the subgraph, not only direct contract calls.
+            </p>
+
+            <button id="loadSubgraphBtn">Load Subgraph Data</button>
+
+            <div class="subgraph-grid">
+              <div>
+                <h3>Markets</h3>
+                <div id="marketsList" class="list-box">No markets loaded yet.</div>
+              </div>
+
+              <div>
+                <h3>Trades</h3>
+                <div id="tradesList" class="list-box">No trades loaded yet.</div>
+              </div>
+
+              <div>
+                <h3>Governance Proposals</h3>
+                <div id="proposalsList" class="list-box">No proposals loaded yet.</div>
+              </div>
+            </div>
+          </div>
+
+            <details class="raw-json">
+              <summary>Raw GraphQL response</summary>
+              <pre id="subgraphOutput">No raw data loaded yet.</pre>
+            </details>
         </article>
       </section>
     </main>

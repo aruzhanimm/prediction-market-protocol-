@@ -141,3 +141,66 @@ pre {
     grid-template-columns: 1fr;
   }
 }
+.wide-card {
+  grid-column: 1 / -1;
+}
+
+.subgraph-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.list-box {
+  background: #0b1220;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+  min-height: 180px;
+}
+
+.list-item {
+  border-bottom: 1px solid var(--border);
+  padding: 12px 0;
+}
+
+.list-item:last-child {
+  border-bottom: 0;
+}
+
+.list-item p {
+  margin: 6px 0;
+  color: var(--text);
+}
+
+.empty-state {
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.pill {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(96, 165, 250, 0.18);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.raw-json {
+  margin-top: 18px;
+}
+
+.raw-json summary {
+  cursor: pointer;
+  color: var(--accent);
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+@media (max-width: 1000px) {
+  .subgraph-grid {
+    grid-template-columns: 1fr;
+  }
+}
