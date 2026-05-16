@@ -1,0 +1,5 @@
+[
+  {"type":"event","name":"Swap","inputs":[{"name":"trader","type":"address","indexed":true},{"name":"buyYes","type":"bool","indexed":false},{"name":"amountIn","type":"uint256","indexed":false},{"name":"amountOut","type":"uint256","indexed":false}]},
+  {"type":"event","name":"LiquidityAdded","inputs":[{"name":"provider","type":"address","indexed":true},{"name":"yesAmount","type":"uint256","indexed":false},{"name":"noAmount","type":"uint256","indexed":false},{"name":"lpMinted","type":"uint256","indexed":false}]},
+  {"type":"event","name":"LiquidityRemoved","inputs":[{"name":"provider","type":"address","indexed":true},{"name":"yesAmount","type":"uint256","indexed":false},{"name":"noAmount","type":"uint256","indexed":false},{"name":"lpBurned","type":"uint256","indexed":false}]}
+]

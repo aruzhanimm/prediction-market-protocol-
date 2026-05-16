@@ -1,0 +1,6 @@
+[
+  {"type":"event","name":"MarketCreated","inputs":[{"name":"marketId","type":"uint256","indexed":true},{"name":"creator","type":"address","indexed":true},{"name":"question","type":"string","indexed":false},{"name":"resolutionTime","type":"uint256","indexed":false}]},
+  {"type":"event","name":"MarketResolved","inputs":[{"name":"marketId","type":"uint256","indexed":true},{"name":"outcome","type":"bool","indexed":false}]},
+  {"type":"event","name":"MarketCancelled","inputs":[{"name":"marketId","type":"uint256","indexed":true}]},
+  {"type":"event","name":"SharesRedeemed","inputs":[{"name":"marketId","type":"uint256","indexed":true},{"name":"redeemer","type":"address","indexed":true},{"name":"sharesBurned","type":"uint256","indexed":false},{"name":"payout","type":"uint256","indexed":false}]}
+]

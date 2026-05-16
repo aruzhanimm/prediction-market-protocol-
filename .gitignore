@@ -10,3 +10,6 @@ out/
 
 # Dotenv file
 .env
+
+subgraph/node_modules/
+subgraph/build/
