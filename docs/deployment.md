@@ -79,18 +79,18 @@ Post-deployment checks passed.
 
 | Contract | Address | Explorer |
 |---|---:|---|
-| GovernanceToken | `0x0000000000000000000000000000000000000000` | Pending |
-| TimelockController | `0x0000000000000000000000000000000000000000` | Pending |
-| MyGovernor | `0x0000000000000000000000000000000000000000` | Pending |
-| Treasury | `0x0000000000000000000000000000000000000000` | Pending |
-| OutcomeShareToken | `0x0000000000000000000000000000000000000000` | Pending |
-| PredictionMarket Implementation V1 | `0x0000000000000000000000000000000000000000` | Pending |
-| PredictionMarket Proxy | `0x0000000000000000000000000000000000000000` | Pending |
-| PredictionMarket Implementation V2 | `0x0000000000000000000000000000000000000000` | Pending |
-| MarketAMM | `0x0000000000000000000000000000000000000000` | Pending |
-| FeeVault | `0x0000000000000000000000000000000000000000` | Pending |
-| MarketFactory | `0x0000000000000000000000000000000000000000` | Pending |
-| ChainlinkResolver | `0x0000000000000000000000000000000000000000` | Pending |
+| GovernanceToken | `0x1d8F27C369BC460f26C8fb5AAb897b4230c2E22c` | https://sepolia.arbiscan.io/search?f=0&q=0x1d8F27C369BC460f26C8fb5AAb897b4230c2E22c |
+| TimelockController | `0xa3317a62CccA788e5924BDDC6cDe36B6ba4984B1` | https://sepolia.arbiscan.io/search?f=0&q=0xa3317a62CccA788e5924BDDC6cDe36B6ba4984B1 |
+| MyGovernor | `0x61E3585B25F8FDEaa127264Bc08f8fc335D92ce2` | https://sepolia.arbiscan.io/search?f=0&q=0x61E3585B25F8FDEaa127264Bc08f8fc335D92ce2 |
+| Treasury | `0x411Df3c1ad4e253302fA4BB553A29d78D65A07A6` | https://sepolia.arbiscan.io/search?f=0&q=0x411Df3c1ad4e253302fA4BB553A29d78D65A07A6 |
+| OutcomeShareToken | `0x2872B16A1b58ce92a5D1d8Da80BcE1abC4eae865` | https://sepolia.arbiscan.io/search?f=0&q=0x2872B16A1b58ce92a5D1d8Da80BcE1abC4eae865 |
+| PredictionMarket Implementation V1 | `0x7C115581124B15187d66045b9910EB1E5F454960` | https://sepolia.arbiscan.io/search?f=0&q=0x7C115581124B15187d66045b9910EB1E5F454960 |
+| PredictionMarket Proxy | `0xc95dE1BAFabE53B2c9a743a4425296Ce4293530e` | https://sepolia.arbiscan.io/search?f=0&q=0xc95dE1BAFabE53B2c9a743a4425296Ce4293530e |
+| PredictionMarket Implementation V2 | `0xc9BD3412ABD9210963142E220ceD49253FB113eA` | https://sepolia.arbiscan.io/search?f=0&q=0xc9BD3412ABD9210963142E220ceD49253FB113eA |
+| MarketAMM | `0xB4d820DD5cD9A5c2eE92AdA161D48c4Ce5cb9dD6` | https://sepolia.arbiscan.io/search?f=0&q=0xB4d820DD5cD9A5c2eE92AdA161D48c4Ce5cb9dD6 |
+| FeeVault | `0xbE5ec37e14B44E0675Fedec533BF235c744367f2` | https://sepolia.arbiscan.io/search?f=0&q=0xbE5ec37e14B44E0675Fedec533BF235c744367f2 |
+| MarketFactory | `0x7549bC2A3F0ce716C067570af1615f97E7A93792` | https://sepolia.arbiscan.io/search?f=0&q=0x7549bC2A3F0ce716C067570af1615f97E7A93792 |
+| ChainlinkResolver | `0x237555EcbF1329821e9245fb255979D512B76592` | https://sepolia.arbiscan.io/search?f=0&q=0x237555EcbF1329821e9245fb255979D512B76592 |
 
 ## Notes
 

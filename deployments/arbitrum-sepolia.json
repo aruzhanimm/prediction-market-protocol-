@@ -1,26 +1,23 @@
 {
-  "network": "Base Sepolia",
-  "chainId": 84532,
-  "status": "pending deployment",
-  "deployer": "0x0000000000000000000000000000000000000000",
-  "rpcEnv": "BASE_SEPOLIA_RPC_URL",
-  "explorer": "https://sepolia.basescan.org",
+  "network": "Arbitrum Sepolia",
+  "chainId": 421614,
+  "deployer": "0xB2159776c44fD145Bf51CD92405e31cE2040Ff73",
   "contracts": {
-    "GovernanceToken": "0x0000000000000000000000000000000000000000",
-    "TimelockController": "0x0000000000000000000000000000000000000000",
-    "MyGovernor": "0x0000000000000000000000000000000000000000",
-    "Treasury": "0x0000000000000000000000000000000000000000",
-    "OutcomeShareToken": "0x0000000000000000000000000000000000000000",
-    "PredictionMarketImplementationV1": "0x0000000000000000000000000000000000000000",
-    "PredictionMarketProxy": "0x0000000000000000000000000000000000000000",
-    "PredictionMarketImplementationV2": "0x0000000000000000000000000000000000000000",
-    "MarketAMM": "0x0000000000000000000000000000000000000000",
-    "FeeVault": "0x0000000000000000000000000000000000000000",
-    "MarketFactory": "0x0000000000000000000000000000000000000000",
-    "ChainlinkResolver": "0x0000000000000000000000000000000000000000"
+    "GovernanceToken": "0x1d8F27C369BC460f26C8fb5AAb897b4230c2E22c",
+    "TimelockController": "0xa3317a62CccA788e5924BDDC6cDe36B6ba4984B1",
+    "MyGovernor": "0x61E3585B25F8FDEaa127264Bc08f8fc335D92ce2",
+    "Treasury": "0x411Df3c1ad4e253302fA4BB553A29d78D65A07A6",
+    "OutcomeShareToken": "0x2872B16A1b58ce92a5D1d8Da80BcE1abC4eae865",
+    "MarketFactory": "0x7549bC2A3F0ce716C067570af1615f97E7A93792",
+    "PredictionMarketImplementationV1": "0x7C115581124B15187d66045b9910EB1E5F454960",
+    "PredictionMarketProxy": "0xc95dE1BAFabE53B2c9a743a4425296Ce4293530e",
+    "PredictionMarketImplementationV2": "0xc9BD3412ABD9210963142E220ceD49253FB113eA",
+    "MarketAMM": "0xB4d820DD5cD9A5c2eE92AdA161D48c4Ce5cb9dD6",
+    "FeeVault": "0xbE5ec37e14B44E0675Fedec533BF235c744367f2",
+    "ChainlinkResolver": "0x237555EcbF1329821e9245fb255979D512B76592"
   },
   "chainlink": {
-    "feed": "0x0000000000000000000000000000000000000000",
+    "feed": "0xd30e2101a97dcbAeBCBC04F14C3f624E67A35165",
     "stalenessThreshold": "3600"
   },
   "governance": {
@@ -31,8 +28,8 @@
     "proposalThreshold": "1%"
   },
   "verification": {
-    "contractsVerified": false,
-    "postDeployCheckPassed": false,
-    "postDeployCheckOutputFile": "docs/post-deploy-check-base-sepolia.md"
+    "contractsVerified": true,
+    "postDeployCheckPassed": true,
+    "postDeployCheckOutputFile": "docs/post-deploy-verify-arbitrum-sepolia.md"
   }
 }
