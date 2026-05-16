@@ -1,0 +1,38 @@
+{
+  "network": "Base Sepolia",
+  "chainId": 84532,
+  "status": "pending deployment",
+  "deployer": "0x0000000000000000000000000000000000000000",
+  "rpcEnv": "BASE_SEPOLIA_RPC_URL",
+  "explorer": "https://sepolia.basescan.org",
+  "contracts": {
+    "GovernanceToken": "0x0000000000000000000000000000000000000000",
+    "TimelockController": "0x0000000000000000000000000000000000000000",
+    "MyGovernor": "0x0000000000000000000000000000000000000000",
+    "Treasury": "0x0000000000000000000000000000000000000000",
+    "OutcomeShareToken": "0x0000000000000000000000000000000000000000",
+    "PredictionMarketImplementationV1": "0x0000000000000000000000000000000000000000",
+    "PredictionMarketProxy": "0x0000000000000000000000000000000000000000",
+    "PredictionMarketImplementationV2": "0x0000000000000000000000000000000000000000",
+    "MarketAMM": "0x0000000000000000000000000000000000000000",
+    "FeeVault": "0x0000000000000000000000000000000000000000",
+    "MarketFactory": "0x0000000000000000000000000000000000000000",
+    "ChainlinkResolver": "0x0000000000000000000000000000000000000000"
+  },
+  "chainlink": {
+    "feed": "0x0000000000000000000000000000000000000000",
+    "stalenessThreshold": "3600"
+  },
+  "governance": {
+    "timelockDelay": "2 days",
+    "votingDelay": "7200 blocks",
+    "votingPeriod": "50400 blocks",
+    "quorum": "4%",
+    "proposalThreshold": "1%"
+  },
+  "verification": {
+    "contractsVerified": false,
+    "postDeployCheckPassed": false,
+    "postDeployCheckOutputFile": "docs/post-deploy-check-base-sepolia.md"
+  }
+}
